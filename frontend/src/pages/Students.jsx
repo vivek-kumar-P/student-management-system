@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 import StudentTable from "../components/StudentTable";
 import StudentForm from "../components/StudentForm";
 import ConfirmDialog from "../components/ConfirmDialog";
 
 export default function Students() {
+  const { user, logout } = useAuth();
+  const canEdit = user.role === "admin" || user.role === "teacher";
+  const canDelete = user.role === "admin";
+
   const [students, setStudents] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,12 +91,28 @@ export default function Students() {
     <div className="max-w-4xl mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Student Management</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-4 py-2 rounded bg-blue-600 text-white"
-        >
-          + Add Student
-        </button>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-600">
+            {user.username}{" "}
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 text-xs uppercase">
+              {user.role}
+            </span>
+          </span>
+          {canEdit && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="px-4 py-2 rounded bg-blue-600 text-white"
+            >
+              + Add Student
+            </button>
+          )}
+          <button
+            onClick={logout}
+            className="px-4 py-2 rounded border border-gray-300"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-3 mb-4">
@@ -120,6 +141,8 @@ export default function Students() {
       {!loading && !error && (
         <StudentTable
           students={students}
+          canEdit={canEdit}
+          canDelete={canDelete}
           onEdit={(s) => {
             setEditing(s);
             setShowForm(true);

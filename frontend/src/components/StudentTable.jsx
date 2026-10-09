@@ -1,7 +1,15 @@
-export default function StudentTable({ students, onEdit, onDelete }) {
+export default function StudentTable({
+  students,
+  onEdit,
+  onDelete,
+  canEdit,
+  canDelete,
+}) {
   if (students.length === 0) {
     return <p className="text-gray-500">No students found.</p>;
   }
+
+  const showActions = canEdit || canDelete;
 
   return (
     <table className="w-full text-left border border-gray-200 rounded-lg overflow-hidden">
@@ -12,7 +20,7 @@ export default function StudentTable({ students, onEdit, onDelete }) {
           <th className="p-3">Email</th>
           <th className="p-3">Age</th>
           <th className="p-3">Department</th>
-          <th className="p-3 text-right">Actions</th>
+          {showActions && <th className="p-3 text-right">Actions</th>}
         </tr>
       </thead>
       <tbody>
@@ -23,20 +31,26 @@ export default function StudentTable({ students, onEdit, onDelete }) {
             <td className="p-3">{s.email}</td>
             <td className="p-3">{s.age}</td>
             <td className="p-3">{s.department}</td>
-            <td className="p-3 text-right space-x-2">
-              <button
-                onClick={() => onEdit?.(s)}
-                className="px-3 py-1 rounded border border-blue-600 text-blue-600 hover:bg-blue-50"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => onDelete?.(s)}
-                className="px-3 py-1 rounded border border-red-600 text-red-600 hover:bg-red-50"
-              >
-                Delete
-              </button>
-            </td>
+            {showActions && (
+              <td className="p-3 text-right space-x-2">
+                {canEdit && (
+                  <button
+                    onClick={() => onEdit?.(s)}
+                    className="px-3 py-1 rounded border border-blue-600 text-blue-600 hover:bg-blue-50"
+                  >
+                    Edit
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    onClick={() => onDelete?.(s)}
+                    className="px-3 py-1 rounded border border-red-600 text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                )}
+              </td>
+            )}
           </tr>
         ))}
       </tbody>
